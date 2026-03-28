@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCPGate — Agentic Workflow Orchestration</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F0EEE8;--surface:#FFFFFF;--ink:#111110;--ink2:#5C5C57;--ink3:#9A9A93;
+  --line:#D4D2CA;--line2:#E8E6DF;--sans:'Inter',sans-serif;--mono:'Inter',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:12px;line-height:1.5;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* HEADER */
+header{height:46px;background:var(--surface);border-bottom:1.5px solid var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.logo{font-weight:700;font-size:13px;letter-spacing:0.06em;display:flex;align-items:center;gap:10px;}
+.logo-tag{font-weight:400;font-size:10px;color:var(--ink3);letter-spacing:0.04em;border:1px solid var(--line);padding:2px 6px;}
+.hdr-right{display:flex;align-items:center;gap:20px;font-size:10px;color:var(--ink3);}
+.hdr-conn{display:flex;align-items:center;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ink);display:inline-block;}
+
+/* LAYOUT */
+.layout{flex:1;display:grid;grid-template-columns:210px 1fr 290px;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;display:flex;flex-direction:column;}
+.sec-hdr{padding:9px 14px 7px;font-size:9px;font-weight:700;letter-spacing:0.14em;color:var(--ink3);text-transform:uppercase;border-bottom:1px solid var(--line2);background:var(--bg);}
+.svc-item{padding:9px 14px;border-bottom:1px solid var(--line2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.svc-name{font-size:11px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.badge{font-size:8px;font-weight:700;letter-spacing:0.06em;padding:2px 5px;border:1px solid var(--ink);color:var(--ink);}
+
+.perms-block{padding:10px 14px;border-bottom:1px solid var(--line2);}
+.perm-row{font-size:9px;color:var(--ink3);margin-bottom:4px;display:flex;gap:6px;}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden;}
+.metrics{display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--surface);}
+.metric{flex:1;padding:8px 16px;border-right:1px solid var(--line2);}
+.metric:last-child{border-right:none;}
+.m-val{font-size:17px;font-weight:700;line-height:1.2;}
+.m-label{font-size:8px;font-weight:700;letter-spacing:0.12em;color:var(--ink3);text-transform:uppercase;margin-top:1px;}
+
+.input-area{border-bottom:1px solid var(--line);padding:12px 18px;background:var(--surface);}
+.input-label{font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--ink3);text-transform:uppercase;margin-bottom:7px;}
+.nl-input{width:100%;font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--bg);padding:8px 10px;resize:none;height:62px;color:var(--ink);outline:none;}
+.input-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.plan-info{font-size:11px;color:var(--ink2);font-weight:600;}
+.btn-run{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:7px 18px;background:var(--ink);color:var(--surface);border:none;cursor:pointer;text-transform:uppercase;}
+.btn-run:disabled{opacity:0.35;cursor:not-allowed;}
+
+.llm-output-wrap{display:none;background:#F9F8F4;border:1px solid var(--line);padding:10px;margin-top:10px;max-height:150px;overflow-y:auto;}
+.llm-output-title{font-size:9px;font-weight:700;color:var(--ink3);margin-bottom:5px;text-transform:uppercase;}
+.llm-output-json{font-family:var(--mono);font-size:10px;color:var(--ink2);white-space:pre-wrap;}
+
+/* DAG */
+.dag-wrap{flex:1;overflow:auto;padding:16px 18px;background:var(--bg);background-image:radial-gradient(circle,var(--line) 1px,transparent 1px);background-size:22px 22px;position:relative;}
+.dag-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.dag-title{font-size:9px;font-weight:700;letter-spacing:0.14em;color:var(--ink3);text-transform:uppercase;}
+.dag-state{font-size:10px;font-weight:700;letter-spacing:0.06em;}
+
+/* LOG PANEL */
+.log-panel{border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;background:#111110;}
+.log-hdr{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.log-title{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);}
+.log-body{flex:1;overflow-y:auto;padding:10px 12px;font-size:10.5px;font-family:var(--mono);}
+.le{display:flex;gap:8px;margin-bottom:3px;line-height:1.6;}
+.le-time{color:rgba(255,255,255,0.2);flex-shrink:0;min-width:52px;font-size:9.5px;}
+.le-msg{flex:1;}
+.le.ok .le-msg{color:#FFFFFF;}
+.le.info .le-msg{color:rgba(255,255,255,0.65);}
+.le.warn .le-msg{color:rgba(255,255,255,0.45);}
+
+/* AUTH PAGE */
+.auth-page{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);background-image:radial-gradient(circle,var(--line) 1px,transparent 1px);background-size:22px 22px;display:flex;align-items:center;justify-content:center;z-index:9999;}
+.auth-card{background:var(--surface);border:1.5px solid var(--ink);width:320px;padding:24px;box-shadow:8px 8px 0px var(--line);}
+.auth-title{font-size:16px;font-weight:700;letter-spacing:0.06em;margin-bottom:6px;display:block;}
+.auth-input{width:100%;font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--bg);padding:10px 12px;margin-bottom:12px;color:var(--ink);outline:none;}
+.btn-login{width:100%;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:0.1em;padding:12px;background:var(--ink);color:var(--surface);border:none;cursor:pointer;text-transform:uppercase;margin-top:8px;}
+.btn-google{width:100%;font-family:var(--sans);font-size:12px;font-weight:600;padding:10px;background:#FFF;color:#333;border:1px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:0;}
+</style>
+</head>
+<body>
+
+<!-- AUTH PAGE -->
+<div class="auth-page" id="auth-page">
+  <div class="auth-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span class="auth-title" id="auth-mode-title">SIGN IN</span>
+      <span style="font-size:11px;cursor:pointer;text-decoration:underline;color:var(--ink2);" onclick="toggleAuthMode()">Toggle Mode</span>
+    </div>
+    <span style="font-size:10px;color:var(--ink3);margin-bottom:24px;display:block;">Agentic Identity Gateway</span>
+    <input type="email" id="auth-email" class="auth-input" placeholder="operator@corp.com" />
+    <input type="password" id="auth-pass" class="auth-input" placeholder="••••••••" />
+    <button class="btn-login" id="btn-login" onclick="handleLogin()">AUTHENTICATE</button>
+    <div style="text-align:center;margin:16px 0;font-size:10px;color:var(--ink3);">— OR —</div>
+    <button class="btn-google" onclick="handleGoogle()">Continue with Google</button>
+    <span style="display:block;text-align:center;font-size:10px;color:var(--ink3);margin-top:16px;cursor:pointer;text-decoration:underline;" onclick="bypassLogin()">Emergency Bypass (Demo Mode)</span>
+  </div>
+</div>
+
+<header id="app-header" style="display:none;">
+  <div class="logo">MCPGATE <span class="logo-tag">AGENTIC ORCHESTRATION</span></div>
+  <div class="hdr-right">
+    <div class="hdr-conn"><span class="dot" id="ollama-dot"></span>Ollama: <span id="ollama-status">CHECKING</span></div>
+    <div>Standalone Mode (SQLite)</div>
+    <div id="hdr-time">00:00:00</div>
+  </div>
+</header>
+
+<div class="layout" id="app-layout" style="display:none;">
+  <div class="sidebar">
+    <div class="sec-hdr">MCP Connectors</div>
+    <div class="svc-item"><div class="svc-name"><span class="dot"></span>Jira</div><span class="badge">LIVE</span></div>
+    <div class="svc-item"><div class="svc-name"><span class="dot"></span>GitHub</div><span class="badge">LIVE</span></div>
+    <div class="svc-item"><div class="svc-name"><span class="dot"></span>Slack</div><span class="badge">LIVE</span></div>
+    <div class="svc-item"><div class="svc-name"><span class="dot"></span>Sheets</div><span class="badge">LIVE</span></div>
+
+    <div class="sec-hdr" style="margin-top:2px">Engine Scopes</div>
+    <div class="perms-block">
+      <div class="perm-row"><span>Log Isolation: ON</span></div>
+      <div class="perm-row"><span>Persistence: SQLite</span></div>
+      <div class="perm-row"><span>State: In-Memory</span></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="metrics">
+      <div class="metric"><div class="m-val" id="m-runs">0</div><div class="m-label">Executions</div></div>
+      <div class="metric"><div class="m-val">100%</div><div class="m-label">Success Rate</div></div>
+      <div class="metric"><div class="m-val" id="m-nodes">0</div><div class="m-label">Planned</div></div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-label">Natural Language Prompt</div>
+      <textarea class="nl-input" id="nl-input" placeholder="Describe your workflow..."></textarea>
+      <div class="input-row">
+        <span class="plan-info" id="plan-info">→ STANDALONE READY</span>
+        <button class="btn-run" id="run-btn" onclick="executeWorkflow()">▶ PLAN &amp; EXECUTE</button>
+      </div>
+      <div class="llm-output-wrap" id="llm-output-wrap">
+        <div class="llm-output-title">LLM PLANNER OUTPUT (JSON)</div>
+        <div class="llm-output-json" id="llm-output-json"></div>
+      </div>
+    </div>
+
+    <div class="dag-wrap">
+      <div class="dag-bar">
+        <span class="dag-title">Execution DAG</span>
+        <span class="dag-state" id="dag-state">IDLE</span>
+      </div>
+      <svg id="dag-svg" width="100%" height="300"></svg>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="log-hdr"><span class="log-title">System Log</span></div>
+    <div class="log-body" id="log-body"></div>
+  </div>
+</div>
+
+<footer>
+  <span class="sb"><span class="dot"></span>ACTIVE</span>
+  <span class="sb" id="sb-step">Ready</span>
+  <span class="sb sb-ml">DAIICT · STANDALONE · PRAMA.AI</span>
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAKfluNUtXEP0N7aJ_krkY-uI6G6yAfx90",
+  authDomain: "flowmind-56c3b.firebaseapp.com",
+  projectId: "flowmind-56c3b",
+  storageBucket: "flowmind-56c3b.firebasestorage.app",
+  messagingSenderId: "274898102510",
+  appId: "1:274898102510:web:3021342010b53ee35eebff",
+  measurementId: "G-LL4EEN5FY4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let currentExecutionId = null;
+let pollInt = null;
+let authMode = 'login';
+
+window.toggleAuthMode = () => {
+    authMode = authMode==='login'?'signup':'login';
+    document.getElementById('auth-mode-title').textContent = authMode==='login'?'SIGN IN':'CREATE ACCOUNT';
+};
+
+window.handleLogin = async () => {
+    const email = document.getElementById('auth-email').value;
+    const pass = document.getElementById('auth-pass').value;
+    try {
+        if(authMode==='login') await signInWithEmailAndPassword(auth, email, pass);
+        else await createUserWithEmailAndPassword(auth, email, pass);
+        unlock(email);
+    } catch(e){ 
+        if(e.code !== 'auth/popup-closed-by-user') alert(e.message); 
+    }
+};
+
+window.handleGoogle = async () => {
+    try {
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        unlock(result.user.email);
+    } catch(e){ 
+        if(e.code !== 'auth/popup-closed-by-user') alert(e.message); 
+    }
+};
+
+window.bypassLogin = () => unlock("solo.op@corp.com");
+
+async function unlock(email) {
+    document.getElementById('auth-page').style.display = 'none';
+    document.getElementById('app-header').style.display = 'flex';
+    document.getElementById('app-layout').style.display = 'grid';
+    log('ok', `Operator connected: ${email}`);
+    await refreshMetrics();
+    await checkHealth(); 
+    setInterval(refreshMetrics, 5000);
+    setInterval(checkHealth, 10000);
+    fetch('/api/v1/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email})});
+}
+
+function tick(){ document.getElementById('hdr-time').textContent = new Date().toTimeString().slice(0,8); }
+setInterval(tick, 1000);
+
+async function checkHealth() {
+    try {
+        const resp = await fetch('/api/v1/health');
+        if(!resp.ok) throw new Error("HTTP Status: " + resp.status);
+        const h = await resp.json();
+        const el = document.getElementById('ollama-status');
+        const dot = document.getElementById('ollama-dot');
+        if(h.status === 'ok') {
+            el.textContent = h.ollama;
+            dot.style.background = h.ollama === 'ONLINE' ? '#00E676' : '#FF5252';
+        }
+    } catch(e) {
+        console.error("Health Check Failed:", e);
+        document.getElementById('ollama-status').textContent = 'ERROR';
+        document.getElementById('ollama-dot').style.background = '#FF5252';
+    }
+}
+
+async function refreshMetrics() {
+    try {
+        const resp = await fetch('/api/v1/metrics');
+        const m = await resp.json();
+        document.getElementById('m-runs').textContent = m.total_runs;
+        document.getElementById('m-nodes').textContent = m.total_plans;
+    } catch(e) {}
+}
+
+window.executeWorkflow = async () => {
+    const prompt = document.getElementById('nl-input').value;
+    if(!prompt) return;
+    const btn = document.getElementById('run-btn');
+    btn.disabled = true; btn.textContent = "PLANNING...";
+    log('sys', 'Requesting DAG Plan from Ollama...');
+
+    try {
+        const resp = await fetch('/api/v1/plan', {
+            method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt})
+        });
+        const plan = await resp.json();
+        currentExecutionId = plan.execution_id;
+        document.getElementById('llm-output-wrap').style.display = 'block';
+        document.getElementById('llm-output-json').textContent = JSON.stringify(plan.dag, null, 2);
+        renderDAG(plan.dag);
+        btn.textContent = "EXECUTING...";
+        await fetch(`/api/v1/execute/${currentExecutionId}`, {method:'POST'});
+        startPolling();
+    } catch(e){
+        log('err', `Plan Error: ${e.message}`);
+        btn.disabled = false; btn.textContent = "▶ PLAN & EXECUTE";
+    }
+};
+
+function startPolling(){
+    if(pollInt) clearInterval(pollInt);
+    pollInt = setInterval(async () => {
+        try {
+            const resp = await fetch(`/api/v1/status/${currentExecutionId}`);
+            const res = await resp.json();
+            const data = res.data;
+            document.getElementById('dag-state').textContent = data.status;
+            document.getElementById('sb-step').textContent = data.current_step || 'Orchestrating...';
+            if(data.status==='COMPLETED' || data.status==='FAILED'){
+                clearInterval(pollInt);
+                document.getElementById('run-btn').disabled = false;
+                document.getElementById('run-btn').textContent = "▶ PLAN & EXECUTE";
+                log(data.status==='COMPLETED'?'ok':'err', `Workflow ${data.status}`);
+                refreshMetrics();
+            }
+        } catch(e){}
+    }, 1000);
+}
+
+function renderDAG(wf){
+    const nodes = wf.nodes || [];
+    const edges = wf.edges || [];
+    const svg = document.getElementById('dag-svg');
+    let h = `<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#111" stroke-width="1.5"/></marker></defs>`;
+    
+    edges.forEach(e => {
+        const f = nodes.find(n=>n.id===e.f), t = nodes.find(n=>n.id===e.t);
+        if(!f || !t) return;
+        h += `<path d="M${f.x+f.w} ${f.y+f.h/2} L${t.x} ${t.y+t.h/2}" fill="none" stroke="#D4D2CA" stroke-width="1" marker-end="url(#arr)"/>`;
+    });
+
+    nodes.forEach(n => {
+        h += `<g><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" fill="#FFF" stroke="#111" stroke-width="1"/>`;
+        h += `<text x="${n.x+n.w/2}" y="${n.y+n.h/2-5}" text-anchor="middle" font-size="10" font-weight="700">${n.label}</text>`;
+        h += `<text x="${n.x+n.w/2}" y="${n.y+n.h/2+10}" text-anchor="middle" font-size="8" fill="#999">${n.svc}</text></g>`;
+    });
+    svg.innerHTML = h;
+}
+
+function log(type, msg){
+    const div = document.createElement('div');
+    div.className = `le ${type}`;
+    div.innerHTML = `<span class="le-time">${new Date().toLocaleTimeString().split(' ')[0]}</span><span class="le-msg">${msg}</span>`;
+    const body = document.getElementById('log-body');
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+}
+</script>
+</body>
+</html>

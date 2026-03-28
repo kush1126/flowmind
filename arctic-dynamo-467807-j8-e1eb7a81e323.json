@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "arctic-dynamo-467807-j8",
+  "private_key_id": "e1eb7a81e323f20e2b093e0c319c5f59432418d5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDqDvashXW43PrG\n8HV5eLkCsBwYTab59hpCSKU4xlDi6YSaoYCU4xrmP2lHPdBGC7CuLncJtXf2c5/Z\n13PHdvQ9SYUnr8eAHtJ8cxo8TaUym8RxNQlM/xlY/WqecTvZC6byga8fT7ZnHLHA\nyheBQhM6SeJtggTNRVT4WyzmcOBD7O53T71opEcxPi/Sx1MGYdkKDrUsKjjry84B\nJr+8doRa8Ea6QxaQ5i5i4pLkFGOjblTuaMIsRIdi5Ox5BLED+F3fhAOq+vMHW3dS\nLWHB+0f9sOvH7wtIkKQh7wskkqM/TWVyKZhXza7mPAVmQBRiHN60JSKEg/clyJ6j\nvHAGW/lbAgMBAAECggEABT1lhKeOOEprgNBO855iF0R7Cd4/KoxkZRnRkmuk0Zek\nZNPQbZox9s1HnZUtgvaYXiXjJf/+hLFs9t2twAg9NTFeqOyfUj0eaDPUIV0kTCA+\n7cE1XphoEwfFVHEOLnCQ1w/+gXxxhcMXhaHglH+2r3uKSqT6V4rBpA0NJxwyy8Jz\nUlfW3BAtu9eLjMXANr3zmtJDl7r5mzbfJkK8GvxWiM2ieNCo0GD9fVWbhyeiQvjh\nEoP9x7AewfH/GtlkYv49twU99pXCm/bE+u+Af1G3yh1X0RPdOFUMuIH9VyEWNkU5\na6Je8CRiWKt3WuC8s1Xu1rL87lorVAB//WZ5STKktQKBgQD+envfsAnNgP4qSzga\nUS9ayT4nSm44eOGCLUhNf0/JYs7rqeDy+3YHcRosyIr5IKiDJhisRuY56FIzrjcU\nE7r1/+08qjobuleo0sz9JOgZVFKb4f+2cQPB95jvemTfEtKJRaBiG68xAk8Gg863\nX2Ma7JcnhbtJQqHfBA0JUWm0nQKBgQDrdTlSygQpesAkapJHBFOsGGo7syn013O6\nSIEA17oFp1fGwntFg7ucdlibQDzjs7EEzxPdiOiBSirHEZ2s7IY3o/r+SXmWeCJS\nhMJ3QbGnnA4l1PL5BzIzHelBXLDNy59LWKFOsI+0wbrp8cCf2utnmUm0YqjcvGqY\njmral/54VwKBgDwUzQRN+rKDPv7bTX6hJk4H7121a/p3R77FVCm/4iWI55OqQwr7\nJa2yHVzvaChTdpWoO/EIuDh5ylabTjO2SNDlwKwvAJMlVqbsRiuKOCYqy2o0XHxF\niH6WJ4x62C/2sLBqOOiQ4rbudZvzKK4QnkRwEWvqXgJ48eDGgxFtIEjdAoGBAOPB\nS0aitG3vF6biE0ZwkAMaxr+iqYX1VjMt6OMIyR6o5UYUXys5pqNM8p6R/5P9/8/4\nAm46/TP6qvBOQOfBDn8JtkJ8jgkXgZOyaWzz9cV8NU8w8ioiZNN/Ll6UK02VlitK\nuxWjwg4Fiyi6OSonl6dpZhr/h/mko7OXpxJ1DagXAoGBAJ72lXJiaV8sICUEuhWI\n5BDVChE2rOtz57hBpxFIZm7427lXHwFBBpDSH794NGquvUZ566lDiepZrvrx6a0y\ndDbqnpuntvzW+uJuJa/ZWqGGYx1kfiBgFO8YGnP3a//Rkb9Q8vjKOuQIAD/Z36Ad\naBsYf4BVVYbUylMgH/eYUawn\n-----END PRIVATE KEY-----\n",
+  "client_email": "mcpgate1126@arctic-dynamo-467807-j8.iam.gserviceaccount.com",
+  "client_id": "107260363924115718845",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/mcpgate1126%40arctic-dynamo-467807-j8.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
