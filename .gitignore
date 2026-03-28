@@ -1,0 +1,7 @@
+.env
+arctic-dynamo-*
+*.db
+.venv/
+__pycache__/
+*.pyc
+mcpgate.db
