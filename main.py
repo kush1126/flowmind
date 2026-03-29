@@ -9,7 +9,8 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Request
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Request, UploadFile, File
+import io
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -582,6 +583,33 @@ async def health_check():
 @app.get("/")
 async def serve_frontend():
     return FileResponse("mcpgate.html")
+
+@app.post("/api/v1/parse-file")
+async def parse_uploaded_file(file: UploadFile = File(...)):
+    filename = file.filename.lower()
+    content = await file.read()
+    extracted_text = ""
+    try:
+        if filename.endswith(".txt") or filename.endswith(".md"):
+            extracted_text = content.decode("utf-8")
+        elif filename.endswith(".csv"):
+            import csv
+            reader = csv.reader(io.StringIO(content.decode("utf-8")))
+            extracted_text = "\n".join([",".join(row) for row in reader])
+        elif filename.endswith(".pdf"):
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(content))
+            extracted_text = "\n".join([page.extract_text() for page in reader.pages if page.extract_text()])
+        elif filename.endswith(".docx"):
+            import docx
+            doc = docx.Document(io.BytesIO(content))
+            extracted_text = "\n".join([p.text for p in doc.paragraphs])
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file format")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
+        
+    return {"filename": file.filename, "text": extracted_text}
 
 @app.post("/api/v1/auth/login")
 async def register_login(payload: LoginPayload, request: Request):

@@ -1,0 +1,14 @@
+Project Update Notes - March 29th
+
+Here are the new tasks that we need to add to our Jira board for the next sprint. Please create them:
+
+1. Task: Update Payment Gateway API
+   Description: The Stripe API is deprecating v2 endpoints next week. We need to migrate the checkout service to v3 endpoints immediately. This is high priority.
+
+2. Task: Fix Navigation Bar Mobile Overflow
+   Description: On devices smaller than 400px, the hamburger menu icon overlays the company logo. We need to add a media query to increase the padding.
+
+3. Task: Add Redis Caching to User Profile
+   Description: The database is getting hit too hard on the user profile page. Let's implement Redis caching for the GET /profile route with a 5-minute TTL.
+
+Instruction: Please create individual Jira issues for each of these three tasks.

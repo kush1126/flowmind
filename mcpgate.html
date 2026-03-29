@@ -49,6 +49,9 @@ header{height:46px;background:var(--surface);border-bottom:1.5px solid var(--ink
 .plan-info{font-size:11px;color:var(--ink2);font-weight:600;}
 .btn-run{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:7px 18px;background:var(--ink);color:var(--surface);border:none;cursor:pointer;text-transform:uppercase;}
 .btn-run:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-action{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.05em;padding:5px 10px;background:var(--bg);color:var(--ink);border:1px solid var(--line);cursor:pointer;text-transform:uppercase;display:flex;align-items:center;gap:5px;transition:0.2s;}
+.btn-action:hover{background:var(--line2);}
+.action-box{display:flex;gap:8px;align-items:center;}
 
 .llm-output-wrap{display:none;background:#F9F8F4;border:1px solid var(--line);padding:10px;margin-top:10px;max-height:150px;overflow-y:auto;}
 .llm-output-title{font-size:9px;font-weight:700;color:var(--ink3);margin-bottom:5px;text-transform:uppercase;}
@@ -136,7 +139,12 @@ header{height:46px;background:var(--surface);border-bottom:1.5px solid var(--ink
       <div class="input-label">Natural Language Prompt</div>
       <textarea class="nl-input" id="nl-input" placeholder="Describe your workflow..."></textarea>
       <div class="input-row">
-        <span class="plan-info" id="plan-info">→ STANDALONE READY</span>
+        <div class="action-box">
+           <button class="btn-action" title="Voice Input" onclick="startVoice()"><span id="voice-icon">🎙️</span> VOICE</button>
+           <button class="btn-action" title="Attach File" onclick="document.getElementById('file-upload').click()">📎 ATTACH</button>
+           <input type="file" id="file-upload" style="display:none;" onchange="handleFileUpload(event)">
+           <span class="plan-info" id="file-info" style="margin-left:5px;"></span>
+        </div>
         <button class="btn-run" id="run-btn" onclick="executeWorkflow()">▶ PLAN &amp; EXECUTE</button>
       </div>
       <div class="llm-output-wrap" id="llm-output-wrap">
@@ -280,6 +288,104 @@ window.executeWorkflow = async () => {
         log('err', `Plan Error: ${e.message}`);
         btn.disabled = false; btn.textContent = "▶ PLAN & EXECUTE";
     }
+};
+
+window.isRecording = false;
+window.recognitionObj = null;
+
+window.startVoice = () => {
+    if (window.isRecording && window.recognitionObj) {
+        window.recognitionObj.stop();
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Voice input is not supported in this browser. Try Chrome or Edge!");
+        return;
+    }
+    
+    window.recognitionObj = new SpeechRecognition();
+    window.recognitionObj.lang = 'en-US';
+    window.recognitionObj.interimResults = true; 
+    window.recognitionObj.continuous = true; 
+
+    window.recognitionObj.onstart = function() {
+        window.isRecording = true;
+        document.getElementById('voice-icon').textContent = '🔴';
+        const input = document.getElementById('nl-input');
+        if (!input.value.endsWith(" ") && input.value.length > 0) input.value += " ";
+        log('sys', 'Voice recording started... Speak now. Click VOICE again to stop.');
+    };
+    
+    window.recognitionObj.onresult = function(event) {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+        const input = document.getElementById('nl-input');
+        if (finalTranscript) {
+             input.value = input.value.replace(window.lastInterim || "", "") + finalTranscript + " ";
+             window.lastInterim = "";
+             log('sys', 'Transcribed: ' + finalTranscript);
+        } else {
+             input.value = input.value.replace(window.lastInterim || "", "") + interimTranscript;
+             window.lastInterim = interimTranscript;
+        }
+    };
+    
+    window.recognitionObj.onerror = function(event) {
+        window.isRecording = false;
+        document.getElementById('voice-icon').textContent = '🎙️';
+        if(event.error !== 'no-speech') log('err', 'Voice input error: ' + event.error + " (Check Mic Permissions in Address Bar)");
+    };
+    
+    window.recognitionObj.onend = function() {
+        window.isRecording = false;
+        document.getElementById('voice-icon').textContent = '🎙️';
+        window.lastInterim = "";
+        log('sys', 'Voice recording stopped.');
+    };
+    
+    try {
+        window.lastInterim = "";
+        window.recognitionObj.start();
+    } catch(e) {
+        log('err', 'Failed to start mic: ' + e.message);
+    }
+};
+
+window.handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if(!file) return;
+    
+    document.getElementById('file-info').textContent = "Extracting...";
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    try {
+        const resp = await fetch('/api/v1/parse-file', {
+            method: 'POST', body: formData
+        });
+        if(!resp.ok) throw new Error(await resp.text());
+        const result = await resp.json();
+        
+        const input = document.getElementById('nl-input');
+        const contextText = `\n\n[Context from file: ${result.filename}]:\n${result.text}\n`;
+        input.value = input.value + contextText;
+        document.getElementById('file-info').textContent = "Attached: " + result.filename;
+        log('ok', `Successfully extracted data from ${result.filename}`);
+    } catch(e) {
+        document.getElementById('file-info').textContent = "Extraction failed.";
+        log('err', `File parse error: ${e.message}`);
+    }
+    // reset input
+    event.target.value = null;
 };
 
 function startPolling(){
